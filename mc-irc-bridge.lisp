@@ -38,6 +38,10 @@
 	   (setf message (format nil "~a~%" (subseq line
 						    (+ (length "[INFO] ") 
 						       (search "[INFO] " line))))))
+	  ((search "[INFO] *" line)
+	   (setf message (format nil "~a~%" (subseq line
+						    (+ (length "[INFO] ")
+						       (search "[INFO] " line))))))
 	  ((and (search "[INFO] " line)
 		(search "] logged in with entity" line))
 	   (setf notice (format nil "~a has joined~%" 
