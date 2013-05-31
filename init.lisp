@@ -14,8 +14,6 @@
 
 ;;     You should have received a copy of the GNU General Public License
 ;;     along with Robort.  If not, see <http://www.gnu.org/licenses/>.
-(defvar *threads-loaded* (ql:quickload "bordeaux-threads"))
-
 (require :cl-irc)
 (require :bordeaux-threads)
 

@@ -19,8 +19,6 @@
   (:use :common-lisp :common-lisp-user))
 (in-package :robort)
 
-(ql:quickload "cl-irc")
-
 (require :cl-irc)
 
 (load "settings.lisp")

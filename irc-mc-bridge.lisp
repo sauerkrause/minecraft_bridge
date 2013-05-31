@@ -15,7 +15,6 @@
 ;;     You should have received a copy of the GNU General Public License
 ;;     along with Robort.  If not, see <http://www.gnu.org/licenses/>.
 (require :cl-irc)
-(defvar *shell-loaded* (ql:quickload "trivial-shell"))
 (require :trivial-shell)
 
 ;; need a package for these helpers separate from the user-commands

@@ -15,10 +15,7 @@
 ;;     You should have received a copy of the GNU General Public License
 ;;     along with Robort.  If not, see <http://www.gnu.org/licenses/>.
 
-(defvar *usocket-loaded* (ql:quickload "usocket"))
 (require :usocket)
-
-(defvar *flexi-streams-loaded* (ql:quickload "flexi-streams"))
 (require :flexi-streams)
 
 (in-package :user-commands)
