@@ -45,10 +45,11 @@
 	  " starved"
 	  " suffocated"
 	  " withered")))
-    (some 
-     (lambda (str) 
-       (search str line)) 
-     death-messages)))
+    (and (not (search "[Rcon]" line))
+	 (some 
+	  (lambda (str) 
+	    (search str line)) 
+	  death-messages))))
 
 (defun handle-line (line)
   (let ((message ())
