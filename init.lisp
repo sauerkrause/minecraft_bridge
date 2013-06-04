@@ -18,9 +18,9 @@
 (require :bordeaux-threads)
 
 (load "common-defs.lisp")
-(load "user-commands.lisp")
 (load "irc-mc-bridge.lisp")
 (load "mc-irc-bridge.lisp")
+(load "user-commands.lisp")
 (in-package :robort)
 
 (defun init-hooks (connection)
