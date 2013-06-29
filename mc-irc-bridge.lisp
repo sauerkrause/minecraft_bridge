@@ -30,6 +30,26 @@
 			    (funcall fn line)) 
 			(progn (setf hit-end T)
 			       (sleep 0.5)))))))
+(defun death-messagep (line)
+  (let ((death-messages
+	 (list
+	  " was"
+	  " got"
+	  " walked"
+	  " drowned"
+	  " hit"
+	  " fell"
+	  " went"
+	  " tried"
+	  " burned"
+	  " starved"
+	  " suffocated"
+	  " withered")))
+    (and (not (search "[Rcon]" line))
+	 (some 
+	  (lambda (str) 
+	    (search str line)) 
+	  death-messages))))
 
 (defun handle-line (line)
   (let ((message ())
@@ -60,9 +80,14 @@
 				       (name-end
 					(search " lost connection: " line
 						:start2 name-begin)))
-				  (subseq line name-begin name-end))))))
-						   
-    	   
+				  (subseq line name-begin name-end)))))
+	  ((and (search "[INFO] " line)
+		(death-messagep line))
+	   (setf notice (format nil "~a~%" 
+				(let* ((name-begin
+					(+ (length "[INFO] ")
+					   (search "[INFO] " line))))
+				  (subseq line name-begin))))))						  
     (dolist (chan robort::*channels*)
       (flet ((bridge (fn arg)
 	       (funcall fn robort::*connection*
