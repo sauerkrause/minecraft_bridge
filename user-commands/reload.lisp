@@ -16,12 +16,17 @@
 ;;     along with Robort.  If not, see <http://www.gnu.org/licenses/>.
 
 (in-package :user-commands)
- 
+
+(load "user-commands/common.lisp") 
+
 (defun reload (msg connection)
   (progn
     (format T "msg: ~a" msg)
     (print "Reloading")
     (robort::fast-reload)
+    (irc:privmsg connection
+		 (get-destination msg)
+		 "Done.")
     (irc:read-message-loop connection)))
 
 (register-auth #'reload)
