@@ -19,11 +19,20 @@
 (load "user-commands/common.lisp")
 
 (defun players (msg connection)
-  (let ((message (cadr (irc:arguments msg)))
-	(response (trivial-shell:shell-command
-			 (format nil "mcrcon -H ~a -P ~a -p ~a \"list\""
+  (let* ((response (trivial-shell:shell-command
+			 (format nil "mcrcon -c -H ~a -P ~a -p ~a \"list\""
 				 mcirc::*rcon-host*
 				 mcirc::*rcon-port*
-				 mcirc::*rcon-passwd*))))
-    (irc:privmsg connection (get-destination msg) response)))
+				 mcirc::*rcon-passwd*)))
+	 (response-list
+	  (loop for i = 0 then (1+ j)
+		as j = (position #\linefeed response :start i)
+		collect (subseq response i j)
+		while j)))
+    (dolist (line response-list)
+      (progn
+	(irc:privmsg connection
+		     (get-destination msg)
+		     line)
+	(sleep 0.1)))))
 (export 'players)
