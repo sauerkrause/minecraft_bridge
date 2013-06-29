@@ -41,7 +41,6 @@
 (defun handle-new-mc-server-output (server output)
   (princ "Handling new output")
   (let ((output-list (split-by-string output (make-string 2 :initial-element #\Nul))))
-    (print output-list)
     (format nil "~a: Players (~a/~a) Version: ~a MOTD: ~a"
 	    server
 	    (remove #\Nul (elt output-list 4))
@@ -77,9 +76,7 @@
       (let ((output (make-string-output-stream)))
 	(loop
 	   for char = (read-char s nil nil)
-	   while char do (format output "~c" (if (eql char #\Nul)
-						 #\Nul
-					       char)))
+	   while char do (format output "~c" char))
 	(handle-mc-server-output server (get-output-stream-string output))))))
 
 (defun info (msg connection)
