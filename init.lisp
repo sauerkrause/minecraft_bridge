@@ -35,7 +35,7 @@
 		  (mcirc::handle-message msg connection)))
   (irc:add-hook connection 'irc::irc-notice-message
 		(lambda (msg)
-		  (mcirc::handle-message msg connection)))
+		  (mcirc::handle-notice msg connection)))
   (irc:add-hook connection 'irc::ctcp-action-message
 		(lambda (msg)
 		  (mcirc::handle-action msg connection))))

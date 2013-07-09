@@ -25,8 +25,11 @@
 
 (load "configs/rcon.lisp")
 
-(defun handle-message(msg connection)
+(defun handle-message (msg connection)
   (say-to-rcons msg "{~a} ~a"))
+
+(defun handle-notice (msg connection)
+  (say-to-rcons msg "(~a) ~a"))
 
 (defun handle-action (msg connection)
   (let ((action (subseq (cadr (irc:arguments msg)) (length "ACTION  "))))
