@@ -22,6 +22,7 @@
   (:export :first-word
 	   :rest-words
 	   :register-auth
+	   :forget-auth
 	   :authed-funcall))
 
 ;; define a package we can shovel allo the things into.
@@ -45,6 +46,9 @@
 
 (defun register-auth (fnsym)
   (setf (gethash fnsym user-command-helpers::*protected-functions*) fnsym))
+
+(defun forget-auth (fnsym)
+  (setf (gethash fnsym user-command-helpers::*protected-functions*) nil))
 
 (defun priviligedp (nick)
   (member nick *allowed-users* :test #'equal))
