@@ -34,3 +34,25 @@
 
 (defun get-nick (msg)
   (irc:source msg))
+
+(defmacro with-gensyms ((&rest names) &body body)
+  `(let ,(loop for n in names collect `(,n (gensym)))
+     ,@body))
+
+(defmacro define-literal (name values &key needs-auth want-value)
+  (with-gensyms (index-value
+                 list-values)
+                `(progn
+                   (defun ,name (msg connection)
+		     (let* ((,list-values ,values)
+			    (,index-value (if (> 1 (length ,list-values))
+					      (random (length ,list-values))
+					    0)))
+                       (let ((item (elt ,list-values ,index-value)))
+			 (irc:privmsg connection
+				      (get-destination msg)
+				      item))))
+		   (user-command-helpers:forget-auth (function ,name))
+                   (when ,needs-auth
+                     (user-command-helpers:register-auth (function ,name)))
+                   (export (quote ,name)))))
