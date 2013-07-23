@@ -39,19 +39,36 @@
   `(let ,(loop for n in names collect `(,n (gensym)))
      ,@body))
 
-(defmacro define-literal (name values &key needs-auth want-value)
+(defmacro define-literal (name values &key needs-auth)
   (with-gensyms (index-value
                  list-values)
                 `(progn
-                   (defun ,name (msg connection)
-		     (let* ((,list-values ,values)
-			    (,index-value (if (< 1 (length ,list-values))
-					      (random (length ,list-values))
-					    0)))
-                       (let ((item (elt ,list-values ,index-value)))
-			 (irc:privmsg connection
-				      (get-destination msg)
-				      item))))
+		   (let ((,list-values ,values))
+		     (defun ,name (msg connection)
+		       (let ((,index-value (if (< 1 (length ,list-values))
+					       (random (length ,list-values))
+					     0)))
+			 (let ((item (elt ,list-values ,index-value)))
+			   (irc:privmsg connection
+					(get-destination msg)
+					item))))
+		     (defun ,(intern 
+			      (string-upcase (concatenate 
+					      'string 
+					      "value-" 
+					      (string name))))
+		       ()
+		       (let ((,index-value (if (< 1 (length ,list-values))
+					       (random (length ,list-values))
+					     0)))
+			 (elt ,list-values ,index-value)))
+		     (defun ,(intern
+			      (string-upcase (concatenate
+					      'string
+					      "literal-"
+					      (string name))))
+		       ()
+		       ,list-values))
 		   (user-command-helpers:forget-auth (function ,name))
                    (when ,needs-auth
                      (user-command-helpers:register-auth (function ,name)))
