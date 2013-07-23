@@ -45,7 +45,7 @@
                 `(progn
                    (defun ,name (msg connection)
 		     (let* ((,list-values ,values)
-			    (,index-value (if (> 1 (length ,list-values))
+			    (,index-value (if (< 1 (length ,list-values))
 					      (random (length ,list-values))
 					    0)))
                        (let ((item (elt ,list-values ,index-value)))
