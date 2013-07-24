@@ -84,7 +84,7 @@
 	(flet ((notice (message) (irc:notice connection (irc:source msg) message)))
 	  (let ((cmd (cadr (irc::arguments msg))))
 	    (when (and (> (length cmd) 1) (prefixedp cmd))
-	      (let* ((cmd-name (first-word (subseq cmd (length (prefixedp cmd)))))
+	      (let* ((cmd-name (remove #\* (first-word (subseq cmd (length (prefixedp cmd))))))
 		     (cmd-file-name (format nil "user-commands/~(~a~).lisp"
 					    cmd-name)))
 		(if (and (probe-file cmd-file-name)
