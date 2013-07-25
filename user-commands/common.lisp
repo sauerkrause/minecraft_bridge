@@ -55,15 +55,17 @@
 	    (string-upcase (concatenate 
 			    'string 
 			    "value-" 
-			    (string name)))) ()
+			    (string name))))
+     ()
      (rand-value ,list-values)))
 
 (defmacro literal-literal (name list-values)
   `(defun ,(intern (string-upcase
 		    (concatenate 'string
 				 "literal-"
-				 (string name)))) ()
-				 ,list-values))
+				 (string name)))) 
+     ()
+     ,list-values))
 
 (defmacro define-literal (name values &key needs-auth)
   (with-gensyms (index-value
