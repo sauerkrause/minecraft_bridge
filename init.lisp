@@ -22,6 +22,7 @@
 (load "mc-irc-bridge.lisp")
 (load "user-commands.lisp")
 (in-package :robort)
+(load "configs/servers.lisp")
 
 (defun init-hooks (connection)
   (irc:remove-hooks connection 'irc::irc-privmsg-message)
@@ -48,8 +49,10 @@
   ;; Maybe initialize some hooks.
   (init-hooks connection)
   (when mcirc::*thread*
-    (bordeaux-threads:destroy-thread mcirc::*thread*))
-  (setf mcirc::*thread* (mcirc::start-bridge connection)))
+    (mapcar (lambda (thread) 
+	      (bordeaux-threads:destroy-thread mcirc::*thread*))
+	    mcirc::*thread*))
+  (setf mcirc::*thread* (mcirc::start-bridge connection *servers*)))
 
 ;; handy reinit command.
 (defun reinit (connection)

@@ -20,7 +20,10 @@
 
 (load "user-commands/common.lisp")
 
-(let ((help-message "Use # to prepend commands. #info will list currently bridged server info. #list-commands will show you what commands you have at your disposal."))
+(let ((help-message (format nil "Use ~a to prepend commands. ~ainfo will list currently bridged server info. ~alist-commands will show you what commands you have at your disposal." 
+			    (car robort::*prefixen*)
+			    (car robort::*prefixen*)
+			    (car robort::*prefixen*))))
   (defun help (msg connection)
     (irc:privmsg connection (get-destination msg) help-message)))
 (export 'help)

@@ -54,13 +54,15 @@ is replaced with replacement."
 
 (defun say-to-rcons (msg rcons-msg)
   (let ((message (cadr (irc:arguments msg))))
-    (trivial-shell:shell-command 
-     (format nil "mcrcon -s -H ~a -P ~a -p ~a \"say ~a\""
-	     *rcon-host* 
-	     *rcon-port* 
-	     *rcon-passwd*
+    (mapcar (lambda (server)
+	      (trivial-shell:shell-command 
+	       (format nil "mcrcon -s -H ~a -P ~a -p ~a \"say ~a\""
+		       (robort::mc-server-rcon-host server)
+		       (robort::mc-server-rcon-port server)
+		       (robort::mc-server-rcon-passwd server)
 	     (replace-all 
 	      (format nil rcons-msg
 		      (irc:source msg)
 		      message)
-	      "\"" "\\\"")))))
+	      "\"" "\\\""))))
+	    robort::*servers*)))

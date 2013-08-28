@@ -21,13 +21,13 @@
 
 (load "configs/mc.lisp")
 
-(defun follow-log (filename fn)
+(defun follow-log (filename fn server-name)
   (let ((hit-end ()))
     (with-open-file (s filename :direction :input)
       (loop for line = (read-line s nil)
 	 while T do (if line 
 			(if hit-end
-			    (funcall fn line)) 
+			    (funcall fn line server-name)) 
 			(progn (setf hit-end T)
 			       (sleep 0.5)))))))
 (defun death-messagep (line)
@@ -51,7 +51,7 @@
 	    (search str line)) 
 	  death-messages))))
 
-(defun handle-line (line)
+(defun handle-line (line server)
   (let ((message ())
 	(notice ()))
     (cond ((search "[INFO] <" line)
@@ -91,14 +91,20 @@
     (dolist (chan robort::*channels*)
       (flet ((bridge (fn arg)
 	       (funcall fn robort::*connection*
-			chan arg)))
+			chan (format nil "~a: ~a" server arg))))
       (when message 
 	(bridge #'irc:privmsg message))
       (when notice
 	(bridge #'irc:notice notice))))))
 
-(defun start-bridge (connection)
-  (bordeaux-threads:make-thread
-   (lambda () (follow-log *server-log* #'handle-line))))
+(defun start-bridge (connection servers)
+  (mapcar 
+   (lambda (server)
+     (bordeaux-threads:make-thread
+      (lambda () (follow-log 
+		  (robort::mc-server-log-location server) 
+		  #'handle-line 
+		  (robort::mc-server-server-name server)))))
+   servers))
 
 (defparameter *thread* ())

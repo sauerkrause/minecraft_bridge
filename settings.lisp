@@ -28,5 +28,5 @@
 (pushnew "#minecraft" *channels* :test #'equal)
 
 ;; command prefixen
-(defparameter *prefixen* `("#" 
+(defparameter *prefixen* `("?" 
 			   ,(format nil "~a: " *botnick*)))

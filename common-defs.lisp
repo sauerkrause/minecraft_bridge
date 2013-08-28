@@ -17,3 +17,13 @@
 (defstruct login-info nick server)
 ;; condition saying that this should reload.
 (define-condition reinitialize-required (error) ())
+
+
+;; structure for mc-server to be used by mc-irc-bridge and irc-mc-bridge
+(defstruct mc-server
+  rcon-host
+  rcon-port
+  rcon-passwd
+  log-location
+  server-name
+  server-port)

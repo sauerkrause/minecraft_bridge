@@ -58,11 +58,11 @@
 	    (remove #\Nul (elt output-list 2))
 	    (remove #\Nul (elt output-list 0)))))
 
-(defun get-mc-info (server port)
+(defun get-mc-info (server)
   (with-open-stream (s
 		     (flexi-streams:make-flexi-stream
 		      (usocket:socket-stream 
-		       (usocket:socket-connect server port
+		       (usocket:socket-connect (robort::mc-server-server-name server) (robort::mc-server-server-port server)
 					       :protocol :stream
 					       :element-type '(unsigned-byte 8)))))
     (setf (flexi-streams:flexi-stream-element-type s) '(unsigned-byte 8))
@@ -77,9 +77,13 @@
 	(loop
 	   for char = (read-char s nil nil)
 	   while char do (format output "~c" char))
-	(handle-mc-server-output server (get-output-stream-string output))))))
+	(handle-mc-server-output 
+	 (robort::mc-server-server-name server) 
+	 (get-output-stream-string output))))))
 
 (defun info (msg connection)
-  (let ((message (get-mc-info *mc-server* *mc-port*)))
-    (irc:privmsg connection (get-destination msg) message)))
+  (mapcar (lambda (server) 
+	    (let ((message (get-mc-info server)))
+	      (irc:privmsg connection (get-destination msg) message)))
+	  robort::*servers*))
 (export 'info)
