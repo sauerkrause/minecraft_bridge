@@ -16,6 +16,7 @@
 ;;     along with Robort.  If not, see <http://www.gnu.org/licenses/>.
 (require :cl-irc)
 (require :bordeaux-threads)
+(require :cl-ppcre)
 
 (in-package :mcirc)
 
@@ -25,11 +26,13 @@
   (let ((hit-end ()))
     (with-open-file (s filename :direction :input)
       (loop for line = (read-line s nil)
-	 while T do (if line 
+	 while T do (progn 
+		      (if line 
 			(if hit-end
-			    (funcall fn line server-name)) 
+			    (funcall fn line server-name))
 			(progn (setf hit-end T)
-			       (sleep 0.5)))))))
+			       (sleep 0.5))))))))
+
 (defun death-messagep (line)
   (let ((death-messages
 	 (list
@@ -51,10 +54,43 @@
 	    (search str line)) 
 	  death-messages))))
 
+(defun handle-translatable-component (line)
+  (let* ((no-ts (cl-ppcre:regex-replace "^[0-9 \:-]*" line ""))
+	 (no-info (subseq no-ts 
+			  (+ (length "[INFO] TranslatableComponent")
+			     (search "[INFO] TranslatableComponent" no-ts))))
+	 (message-type ())
+	 (message (let ((begin (cl-ppcre:scan "args=\\[" no-info)))
+		    (flet ((get-args (str)
+				     (format nil "~a" (subseq str
+                                                 (+ begin (length "args=\\[") -1)
+                                                 (cl-ppcre:scan "\\], " str :start begin)))))
+			  (cond
+			   ((search "'chat.type.text'" no-info)
+			    (progn
+			      (setf message-type 'text)
+			      (get-args no-info)))
+			   ((search "'chat.type.emote'" no-info)
+			    (progn
+			      (setf message-type 'emote)
+			      (get-args no-info)))))))
+	 (args (cl-ppcre:split ", " message :limit 2)))
+    (if (and args message-type)
+	(let ((format-str
+	       (case message-type
+		     ('text "<~a> ~a")
+		     ('emote "* ~a ~a"))))
+	  (format nil format-str (car args) (cadr args))))))
+
 (defun handle-line (line server)
   (let ((message ())
 	(notice ()))
-    (cond ((search "[INFO] <" line)
+    (cond ((search "TranslatableComponent" line)
+	   (princ line)
+	   (let ((msg (handle-translatable-component line)))
+	     (if msg
+		 (setf message (format nil "~a~%" msg)))))
+	  ((search "[INFO] <" line)
 	   (setf message (format nil "~a~%" (subseq line
 						    (+ (length "[INFO] ") 
 						       (search "[INFO] " line))))))
